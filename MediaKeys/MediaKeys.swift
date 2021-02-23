@@ -53,14 +53,14 @@ public class MediaKeys: NSObject, EventTapDelegate {
     }
 
     private func observeApplicationEvents() {
-        let center = NSWorkspace.shared().notificationCenter
+        let center = NSWorkspace.shared.notificationCenter
         center.addObserver(self,
                            selector: #selector(applicationDidActivate(_:)),
-                           name: .NSWorkspaceDidActivateApplication,
+                           name: NSWorkspace.didActivateApplicationNotification,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(applicationDidTerminate(_:)),
-                           name: .NSWorkspaceDidTerminateApplication,
+                           name: NSWorkspace.didTerminateApplicationNotification,
                            object: nil)
     }
 
@@ -83,14 +83,14 @@ public class MediaKeys: NSObject, EventTapDelegate {
     private func handleNotification(_ notification: Notification) {
         guard let identifier = getIdentifier(for: notification) else { return }
         guard appWhitelist.contains(identifier) else { return }
-        if let index = runningApps.index(of: identifier) {
+      if let index = runningApps.firstIndex(of: identifier) {
             runningApps.remove(at: index)
         }
     }
 
     private func getIdentifier(for notification: Notification) -> String? {
         guard let userInfo = notification.userInfo else { return nil }
-        guard let app = userInfo[NSWorkspaceApplicationKey] as?
+      guard let app = userInfo[NSWorkspace.applicationUserInfoKey] as?
             NSRunningApplication else { return nil }
         return app.bundleIdentifier
     }
